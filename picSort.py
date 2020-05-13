@@ -8,14 +8,15 @@ from datetime import datetime
 import exifread
 from shutil import copy
 # import pdb
+
+
 def main():
     # pdb.set_trace()
     parser = argparse.ArgumentParser(
         description=
-        'A Script to sort picutures based on their exif metadatas DateTimeOriginal'
+        'A Script to sort JPG picutures based on their exif metadatas DateTimeOriginal tag'
     )
     parser.add_argument('-f', '--folder', required=True)
-    parser.add_argument('-t', '--type', default='*.JPG', required=False)
     parser.add_argument('-s',
                         '--sort',
                         choices=['yearly', 'monthly'],
@@ -27,7 +28,7 @@ def main():
     # set the folder to look for pictures
     picture_dir = args.folder
     # create a list of pictures found in this directory using glob module
-    picture_list = glob.glob1(picture_dir, args.type)
+    picture_list = glob.glob1(picture_dir, '*.JPG')
     # create a list to store the timestamps
     timestamp_human_list = []
     #
