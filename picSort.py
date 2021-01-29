@@ -12,7 +12,7 @@ def main():
         'A Script to sort JPG picutures based on their exif metadatas DateTimeOriginal tag'
     )
     parser.add_argument('-sf', required=True, help='This folder needs to be sorted')
-    parser.add_argument('-df', required=False, help='Destination folder for sorted pictures')
+    parser.add_argument('-df', required=True, help='Destination folder for sorted pictures')
 
     global args
     args = parser.parse_args()
@@ -28,7 +28,6 @@ def main():
         folder_dst_combined = os.path.join(folder_dst_yearly, folder_dst_monthly)
         if not args.df:
             osPath = os.path.join(args.sf, folder_dst_combined) # relativ year/month
-            # print(osPath)
         else:
             osPath = os.path.join(args.df, folder_dst_combined)
         if not os.path.exists(osPath):
@@ -47,8 +46,9 @@ def main():
                 except IOError as e:
                     print("Unable to copy file. %s" % e)
 
-    
-    
+    renameFiles(args.df)
+        
+  
 def get_Files():
     fileList = []
     for root, dirs, files in os.walk(args.sf):
@@ -65,13 +65,22 @@ def map_PicDate():
         tag = str(dateTime['EXIF DateTimeOriginal'])
         DateTimeList.append(tag)
     return dict(zip(fileList, DateTimeList))
-    
-    
+
+def renameFiles(src):
+    fileList = []
+    for root, dirs, files in os.walk(src):
+        fileList = fileList + [os.path.join(root,x) for x in files if x.endswith(('.jpg','.JPG'))]
+    for file in fileList:
+        f =  open(file, 'rb')
+        dateTime = exifread.process_file(f, details=False, stop_tag='EXIF DateTimeOriginal')
+        f.close()
+        tag = str(dateTime['EXIF DateTimeOriginal'])
+        filename = (tag.replace(' ', '').replace(':', '') + '.JPG')
+        dst = os.path.join(os.path.dirname(file), filename)
+        os.rename(file, dst)
+        
+   
 
 if __name__ == "__main__":
     main()
     
-
-# >>> print(date_string.replace(':', '_').replace(' ', ''))
-# 2020_02_2215_47_19
-
