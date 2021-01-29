@@ -16,6 +16,37 @@ def main():
 
     global args
     args = parser.parse_args()
+
+    ### Actual copy or move Job bellow ###
+
+    picDateMapping = map_PicDate()
+    access_rights = 0o755
+
+    for pic, time in picDateMapping.items():
+        folder_dst_yearly = str(time[0:4])
+        folder_dst_monthly = str(time[5:7])
+        folder_dst_combined = os.path.join(folder_dst_yearly, folder_dst_monthly)
+        if not args.df:
+            osPath = os.path.join(args.sf, folder_dst_combined) # relativ year/month
+            # print(osPath)
+        else:
+            osPath = os.path.join(args.df, folder_dst_combined)
+        if not os.path.exists(osPath):
+            os.makedirs(osPath, access_rights, exist_ok=True)
+            try:
+                print('Copy image', pic, 'to', osPath)
+                copy(pic, osPath)
+            except IOError as e:
+                print("Unable to copy file. %s" % e)
+            else:
+                print('Folder', osPath, 'exists ... copy file', pic,
+                      'to folder', osPath)
+                try:
+                    print('Copy image', pic, 'to', osPath)
+                    copy(pic, osPath)
+                except IOError as e:
+                    print("Unable to copy file. %s" % e)
+
     
     
 def get_Files():
