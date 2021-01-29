@@ -11,13 +11,12 @@ def main():
         description=
         'A Script to sort JPG picutures based on their exif metadatas DateTimeOriginal tag'
     )
-    parser.add_argument('-sf', required=True)
-    parser.add_argument('-df', required=False)
+    parser.add_argument('-sf', required=True, help='This folder needs to be sorted')
+    parser.add_argument('-df', required=False, help='Destination folder for sorted pictures')
 
     global args
     args = parser.parse_args()
-    DateTime()
-
+    
     
 def get_Files():
     fileList = []
@@ -25,14 +24,18 @@ def get_Files():
         fileList = fileList + [os.path.join(root,x) for x in files if x.endswith(('.jpg','.JPG'))]
     return fileList
 
-def DateTime():
+def map_PicDate():
+    #  
     fileList = get_Files()
-    PictureDate = []
+    DateTimeList = []
     for pic in fileList:
         f =  open(pic, 'rb')
         dateTime = exifread.process_file(f, details=False, stop_tag='EXIF DateTimeOriginal')
-        PictureDate.append(dateTime['EXIF DateTimeOriginal'])
-
+        tag = str(dateTime['EXIF DateTimeOriginal'])
+        DateTimeList.append(tag)
+    return dict(zip(fileList, DateTimeList))
+    
+    
 
 if __name__ == "__main__":
     main()
@@ -40,3 +43,4 @@ if __name__ == "__main__":
 
 # >>> print(date_string.replace(':', '_').replace(' ', ''))
 # 2020_02_2215_47_19
+
