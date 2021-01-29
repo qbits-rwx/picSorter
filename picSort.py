@@ -4,7 +4,7 @@
 import argparse
 import os
 import exifread
-from shutil import copy
+from shutil import copy, rmtree
 
 def main():
     parser = argparse.ArgumentParser(
@@ -46,7 +46,24 @@ def main():
                 except IOError as e:
                     print("Unable to copy file. %s" % e)
 
-    renameFiles(args.df)
+    deleteSourceFolder = 'N'
+    renamePictures = 'N'
+    renamePictures = input('Do you want to rename the files based on their timestamp? - [y|N]')
+    
+    if renamePictures == 'y':
+        renameFiles(args.df)
+    else:
+        print('[INFO] Skip file renaming')
+    
+    deleteSourceFolder = input('[!!!CAUTION!!!] Do you want to delete all original files in {} - [y|N]').format(args.sf)
+
+    if deleteSourceFolder == 'y':
+        deleteSourceFolder(args.sf)
+    else:
+        print('[INFO] Skip file deletion')
+
+
+    
         
   
 def get_Files():
@@ -78,8 +95,12 @@ def renameFiles(src):
         filename = (tag.replace(' ', '').replace(':', '') + '.JPG')
         dst = os.path.join(os.path.dirname(file), filename)
         os.rename(file, dst)
-        
-   
+
+def deleteSourceFolder(dirPath):
+    try:
+        rmtree(dirPath)
+    except:
+        print('Error while deleting directory')
 
 if __name__ == "__main__":
     main()
