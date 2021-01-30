@@ -37,16 +37,13 @@ def main():
                 copy(pic, osPath)
             except IOError as e:
                 print("Unable to copy file. %s" % e)
-            else:
-                print('Folder', osPath, 'exists ... copy file', pic,
-                      'to folder', osPath)
-                try:
-                    print('Copy image', pic, 'to', osPath)
-                    copy(pic, osPath)
-                except IOError as e:
-                    print("Unable to copy file. %s" % e)
+        else:
+            try:
+                print('Copy image', pic, 'to', osPath)
+                copy(pic, osPath)
+            except IOError as e:
+                print("Unable to copy file. %s" % e)
 
-    deleteSourceFolder = 'N'
     renamePictures = 'N'
     renamePictures = input('Do you want to rename the files based on their timestamp? - [y|N]')
     
@@ -55,16 +52,9 @@ def main():
     else:
         print('[INFO] Skip file renaming')
     
-    deleteSourceFolder = input('[!!!CAUTION!!!] Do you want to delete all original files in {} - [y|N]').format(args.sf)
+    # deleteSourceFolder = 'N'
+    # deleteSourceFolder = input('[!!!CAUTION!!!] Do you want to delete all original files in {} - [y|N]'.format(args.sf))
 
-    if deleteSourceFolder == 'y':
-        deleteSourceFolder(args.sf)
-    else:
-        print('[INFO] Skip file deletion')
-
-
-    
-        
   
 def get_Files():
     fileList = []
@@ -96,12 +86,5 @@ def renameFiles(src):
         dst = os.path.join(os.path.dirname(file), filename)
         os.rename(file, dst)
 
-def deleteSourceFolder(dirPath):
-    try:
-        rmtree(dirPath)
-    except:
-        print('Error while deleting directory')
-
 if __name__ == "__main__":
     main()
-    
