@@ -17,6 +17,16 @@ def main():
     global args
     args = parser.parse_args()
 
+    picCount = get_Files()
+    sortNow = 'Y'
+    sortNow = input('Found {} pictures...sort now? - [Y|n]'.format(len(picCount)))
+    
+    #if sortNow == 'y':
+    #    sortNow(args.df)
+    #else:
+    #    print('[INFO] Skip file renaming')
+    
+
     ### Actual copy or move Job bellow ###
 
     picDateMapping = map_PicDate()
