@@ -6,6 +6,7 @@ import os
 import exifread
 from shutil import copy, rmtree
 from sys import exit
+from tqdm import tqdm
 
 def main():
     parser = argparse.ArgumentParser(
@@ -27,7 +28,7 @@ def main():
 
     if sortNow == 'Y' or sortNow == 'y':
         ### Actual copy Job ###
-        for pic, time in picDateMapping.items():
+        for pic, time in tqdm(picDateMapping.items()):
             folder_dst_yearly = str(time[0:4])
             folder_dst_monthly = str(time[5:7])
             folder_dst_combined = os.path.join(folder_dst_yearly, folder_dst_monthly)
@@ -38,13 +39,11 @@ def main():
             if not os.path.exists(osPath):
                 os.makedirs(osPath, access_rights, exist_ok=True)
                 try:
-                    print('Copy image', pic, 'to', osPath)
                     copy(pic, osPath)
                 except IOError as e:
                     print("Unable to copy file. %s" % e)
             else:
                 try:
-                    print('Copy image', pic, 'to', osPath)
                     copy(pic, osPath)
                 except IOError as e:
                     print("Unable to copy file. %s" % e)
