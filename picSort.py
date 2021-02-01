@@ -5,6 +5,7 @@ import argparse
 import os
 import exifread
 from shutil import copy, rmtree
+from sys import exit
 
 def main():
     parser = argparse.ArgumentParser(
@@ -17,53 +18,54 @@ def main():
     global args
     args = parser.parse_args()
 
-    picCount = get_Files()
-    sortNow = 'Y'
-    sortNow = input('Found {} pictures...sort now? - [Y|n]'.format(len(picCount)))
+    sourceFiles = get_Files()
     
-    #if sortNow == 'y':
-    #    sortNow(args.df)
-    #else:
-    #    print('[INFO] Skip file renaming')
-    
-
-    ### Actual copy or move Job bellow ###
-
     picDateMapping = map_PicDate()
     access_rights = 0o755
-
-    for pic, time in picDateMapping.items():
-        folder_dst_yearly = str(time[0:4])
-        folder_dst_monthly = str(time[5:7])
-        folder_dst_combined = os.path.join(folder_dst_yearly, folder_dst_monthly)
-        if not args.df:
-            osPath = os.path.join(args.sf, folder_dst_combined) # relativ year/month
-        else:
-            osPath = os.path.join(args.df, folder_dst_combined)
-        if not os.path.exists(osPath):
-            os.makedirs(osPath, access_rights, exist_ok=True)
-            try:
-                print('Copy image', pic, 'to', osPath)
-                copy(pic, osPath)
-            except IOError as e:
-                print("Unable to copy file. %s" % e)
-        else:
-            try:
-                print('Copy image', pic, 'to', osPath)
-                copy(pic, osPath)
-            except IOError as e:
-                print("Unable to copy file. %s" % e)
-
-    renamePictures = 'N'
-    renamePictures = input('Do you want to rename the files based on their timestamp? - [y|N]')
     
-    if renamePictures == 'y':
+    sortNow = input('Found {} pictures...sort now? - [Y|n]'.format(len(sourceFiles))) or 'Y'
+
+    if sortNow == 'Y' or sortNow == 'y':
+        ### Actual copy Job ###
+        for pic, time in picDateMapping.items():
+            folder_dst_yearly = str(time[0:4])
+            folder_dst_monthly = str(time[5:7])
+            folder_dst_combined = os.path.join(folder_dst_yearly, folder_dst_monthly)
+            if not args.df:
+                osPath = os.path.join(args.sf, folder_dst_combined) # relativ year/month
+            else:
+                osPath = os.path.join(args.df, folder_dst_combined)
+            if not os.path.exists(osPath):
+                os.makedirs(osPath, access_rights, exist_ok=True)
+                try:
+                    print('Copy image', pic, 'to', osPath)
+                    copy(pic, osPath)
+                except IOError as e:
+                    print("Unable to copy file. %s" % e)
+            else:
+                try:
+                    print('Copy image', pic, 'to', osPath)
+                    copy(pic, osPath)
+                except IOError as e:
+                    print("Unable to copy file. %s" % e)
+    else:
+        print('[INFO] Have a nice day')
+        exit(0)
+
+    renamePictures = input('Do you want to rename the files based on their timestamp? - [y|N]') or 'N'
+    
+    if renamePictures == 'y' or renamePictures == 'Y':
         renameFiles(args.df)
     else:
         print('[INFO] Skip file renaming')
     
-    # deleteSourceFolder = 'N'
-    # deleteSourceFolder = input('[!!!CAUTION!!!] Do you want to delete all original files in {} - [y|N]'.format(args.sf))
+    deleteSourceFiles = input('[CAUTION] Do you want to delete all original files in {} - [y|N]'.format(args.sf)) or 'N'
+
+    if deleteSourceFiles == 'y' or deleteSourceFiles == 'Y':
+        deleteFiles(sourceFiles)
+    else:
+        print('[INFO] Skip file renaming')
+        exit(0)
 
   
 def get_Files():
@@ -95,6 +97,14 @@ def renameFiles(src):
         filename = (tag.replace(' ', '').replace(':', '') + '.JPG')
         dst = os.path.join(os.path.dirname(file), filename)
         os.rename(file, dst)
+
+def deleteFiles(files):
+    try:
+        for file in files:
+            os.remove(file)
+    except:
+        raise
+    print('[INFO] Successfully removed {} files.'.format(len(files)))
 
 if __name__ == "__main__":
     main()
