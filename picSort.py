@@ -78,10 +78,13 @@ def map_PicDate():
     fileList = get_Files()
     DateTimeList = []
     for pic in fileList:
-        f =  open(pic, 'rb')
-        dateTime = exifread.process_file(f, details=False, stop_tag='EXIF DateTimeOriginal')
-        tag = str(dateTime['EXIF DateTimeOriginal'])
-        DateTimeList.append(tag)
+        try:
+            f =  open(pic, 'rb')
+            dateTime = exifread.process_file(f, details=False, stop_tag='EXIF DateTimeOriginal')
+            tag = str(dateTime['EXIF DateTimeOriginal'])
+            DateTimeList.append(tag)
+        except:
+            continue
     return dict(zip(fileList, DateTimeList))
 
 def renameFiles(src):
